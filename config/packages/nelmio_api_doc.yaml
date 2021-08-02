@@ -1,0 +1,45 @@
+#nelmio_api_doc:
+#    documentation:
+#        info:
+#            title: My App
+#            description: This is an awesome app!
+#            version: 1.0.0
+#    areas: # to filter documented areas
+#        path_patterns:
+#            - ^/api_OLD_DOC(?!/doc$) # Accepts routes under /api_OLD_DOC except /api_OLD_DOC/doc
+
+nelmio_api_doc:
+    models: { use_jms: true }
+    documentation:
+        host: api.app.cc
+        schemes: [http, https]
+        info:
+            title: App
+            description: App api docs
+            version: 1.0.0
+            license:
+            name: Apache 2.0
+            url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+        securityDefinitions:
+            Bearer:
+                type: apiKey
+                description: 'Value: Bearer {jwt}'
+                name: Authorization
+                in: header
+        security:
+            - Bearer: []
+
+    areas:
+        default:
+            path_patterns:
+                 - ^\/((?!_error)(?!_profiler)(?!_wdt)(?!doc)(?!fubar).)*$
+
+#        _profiler:
+#            path_patterns: [ ^/(?!_profiler/) ]
+#        path_patterns:
+#            - ^/(?!/_)
+#            - ^/(?!/doc$)
+#            - ^/api/(?!/doc$)
+#        host_patterns:
+#        - ^api_OLD_DOC

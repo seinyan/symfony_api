@@ -1,0 +1,82 @@
+parameters:
+    locale: 'en'
+    emailNorely: '%env(resolve:EMAIL_NORELY)%'
+    emailDev: '%env(resolve:EMAIL_DEV)%'
+    app_domain: '%env(resolve:APP_DOMAIN)%'
+    jwt_conf:
+        secret_key: '%env(resolve:JWT_SECRET_KEY)%'
+        public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
+        pass_phrase: '%env(JWT_PASSPHRASE)%'
+        token_ttl: '%env(JWT_TTL)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+
+    app.emailService:
+        class: App\Services\EmailService
+        arguments: ['@mailer', '%emailNorely%', '%emailDev%']
+        autowire: true
+        public: true
+    App\Services\EmailService: '@app.emailService'
+
+    app.JWTService:
+        class: App\Services\JWTService
+        arguments:
+            - '%jwt_conf%'
+        autowire: true
+        public: true
+    App\Services\JWTService: '@app.JWTService'
+
+    app.UserLogServ:
+        class: App\Services\UserLogServ
+        autowire: true
+        public: true
+        arguments:
+            - '@doctrine.orm.entity_manager'
+    App\Services\UserLogServ: '@app.UserLogServ'
+
+    app.UserService:
+        class: App\Services\UserService
+        autowire: true
+        public: true
+        arguments:
+            - '@app.emailService'
+            - '@app.JWTService'
+            - '@doctrine.orm.entity_manager'
+            - '@security.password_encoder'
+            - '@app.UserLogServ'
+    App\Services\UserService: '@app.UserService'
+
+    App\EventSubscriber\SecuritySubscriber:
+        arguments:
+            - "@request_stack"
+            - '@app.UserLogServ'
+
+    App\Services\FileService:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%kernel.project_dir%'
+
+    App\Services\InitService:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+
+
+

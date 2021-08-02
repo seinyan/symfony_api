@@ -1,0 +1,40 @@
+security:
+
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+            cost: 15
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            pattern: /
+            provider: app_user_provider
+            #anonymous: ~
+            stateless: true  # if you want, disable storing the user in the session
+            anonymous: true
+            lazy: true
+#            logout: false
+            guard:
+                authenticators:
+                    - App\Security\ApiLoginAuthenticator
+                    - App\Security\ApiTokenAuthenticator
+            entry_point: App\Security\ApiLoginAuthenticator
+
+    access_control:
+        - { path: ^/test, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#        - { path: ^/logout, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/restore, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/file/image/upload_ckeditor, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: [ROLE_ADMIN, ROLE_USER] }

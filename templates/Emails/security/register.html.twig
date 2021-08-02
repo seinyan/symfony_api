@@ -1,0 +1,9 @@
+{% extends 'email_base.html.twig' %}
+
+{% block body %}
+{#{% spaceless %}#}
+    <p>Здравствуйте!</p>
+    <p>Логин: {{ username }}</p>
+    <p>Ваш пароль: {{ password }}</p>
+{#{% endspaceless %}#}
+{% endblock %}
